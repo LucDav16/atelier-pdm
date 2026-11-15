@@ -1,0 +1,38 @@
+name: Build installer
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Python packages
+        run: python -m pip install --upgrade pip pyinstaller -r requirements.txt
+      - name: Build the program
+        run: python -m PyInstaller --noconfirm --clean --distpath dist --workpath build atelier.spec
+      - name: Install Inno Setup
+        run: choco install innosetup -y --no-progress
+      - name: Build the installer
+        shell: cmd
+        run: '"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /Qp "/DDistDir=dist\Atelier PDM" installer.iss'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AtelierPDM-installer
+          path: Output/*.exe
+      - name: Publish a release (tags only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: Output/*.exe
+          prerelease: ${{ contains(github.ref_name, 'beta') }}
+          generate_release_notes: true

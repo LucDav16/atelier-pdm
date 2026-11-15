@@ -1,0 +1,27 @@
+# never commit vault data, keys or settings
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+atelier_vault.key
+atelier_config.json
+atelier_settings.json
+install.json
+*recovery code*
+*.moved-to-server
+# build output
+Output/
+dist/
+build/
+venv/
+.venv/
+*.exe
+*.msi
+# temporary / backups
+__pycache__/
+*.pyc
+*.bak
+*.partial
+*.tmp
+*.enc-tmp
+plugin/target/
